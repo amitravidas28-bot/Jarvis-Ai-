@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> AI JARVIS</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #050b18;
+  color: #00eaff;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.app {
+  width: 100%;
+  max-width: 430px;
+  text-align: center;
+  border: 1px solid #087d9c;
+  border-radius: 22px;
+  padding: 25px;
+  background: #09172b;
+  box-shadow: 0 0 30px #003c65;
+}
+
+h1 {
+  letter-spacing: 3px;
+}
+
+.circle {
+  width: 150px;
+  height: 150px;
+  margin: 30px auto;
+  border: 3px solid #00eaff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 0 25px #00eaff;
+}
+
+#status {
+  color: #9beeff;
+  font-size: 14px;
+}
+
+input {
+  width: 100%;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #00eaff;
+  background: #10243d;
+  color: white;
+  font-size: 16px;
+}
+
+button {
+  padding: 13px 20px;
+  margin: 8px 3px;
+  border: none;
+  border-radius: 10px;
+  background: #00c9ed;
+  color: #00111c;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#answer {
+  color: white;
+  margin-top: 20px;
+  line-height: 1.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<h1>AMIT AI</h1>
+<p>PERSONAL JARVIS ASSISTANT</p>
+
+<div class="circle">JARVIS</div>
+
+<p id="status">SYSTEM ONLINE</p>
+
+<input
+  id="message"
+  type="text"
+  placeholder="Ask me anything..."
+/>
+
+<br>
+
+<button onclick="sendMessage()">SEND</button>
+<button onclick="startVoice()">🎤 SPEAK</button>
+
+<div id="answer">
+  Hello Jarvis! I am your JARVIS.
+</div>
+
+</div>
+
+<script>
+
+const answer = document.getElementById("answer");
+const statusText = document.getElementById("status");
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) {
+    statusText.innerText = "VOICE NOT SUPPORTED";
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "en-IN";
+  speech.rate = 1;
+
+  window.speechSynthesis.speak(speech);
+}
+
+function sendMessage() {
+
+  const msg = document
+    .getElementById("message")
+    .value.trim()
+    .toLowerCase();
+
+  if (!msg) return;
+
+  let reply = "I am  AI JARVIS. My AI brain is not connected yet.";
+
+  if (msg.includes("hello") || msg.includes("hi")) {
+    reply = "Hello Jarvis! How can I help you?";
+  }
+  else if (msg.includes("your name")) {
+    reply = "My name is  AI JARVIS.";
+  }
+  else if (msg.includes("time")) {
+    reply = "The time is " +
+      new Date().toLocaleTimeString();
+  }
+  else if (msg.includes("date")) {
+    reply = "Today's date is " +
+      new Date().toLocaleDateString();
+  }
+  else if (msg.includes("how are you")) {
+    reply = "I am online and ready to help you.";
+  }
+
+  answer.innerText = reply;
+  speak(reply);
+}
+
+function startVoice() {
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    statusText.innerText =
+      "VOICE RECOGNITION NOT SUPPORTED";
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+
+  recognition.lang = "en-IN";
+  recognition.interimResults = false;
+
+  recognition.onstart = function() {
+    statusText.innerText = "LISTENING...";
+  };
+
+  recognition.onresult = function(event) {
+    document.getElementById("message").value =
+      event.results[0][0].transcript;
+
+    statusText.innerText = "VOICE RECEIVED";
+    sendMessage();
+  };
+
+  recognition.onerror = function() {
+    statusText.innerText = "VOICE ERROR";
+  };
+
+  recognition.onend = function() {
+    if (statusText.innerText === "LISTENING...") {
+      statusText.innerText = "SYSTEM ONLINE";
+    }
+  };
+
+  recognition.start();
+}
+
+</script>
+
+</body>
+</html>
